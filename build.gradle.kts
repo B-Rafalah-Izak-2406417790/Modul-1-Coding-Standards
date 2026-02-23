@@ -5,6 +5,7 @@ val webdrivermanagerVersion = "5.6.3"
 plugins {
 	java
 	jacoco
+	id("org.sonarqube") version "4.4.1.3373"
 	id("org.springframework.boot") version "3.5.10"
 	id("io.spring.dependency-management") version "1.1.7"
 }
@@ -77,4 +78,17 @@ tasks.test{
 
 tasks.jacocoTestReport{
 	dependsOn(tasks.test)
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
+}
+
+sonar {
+	properties {
+		property("sonar.projectKey", "B-Rafalah-Izak-2406417790_Modul-1-Coding-Standards")
+		property("sonar.organization", "b-rafalah-izak-2406417790")
+		property("sonar.host.url", "https://sonarcloud.io")
+		property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
+	}
 }
