@@ -31,18 +31,29 @@ repositories {
 }
 
 dependencies {
+	// implementation
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+
+	// compileOnly
 	compileOnly("org.projectlombok:lombok")
+
+	// developmentOnly
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
+
+	// annotationProcessor
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	annotationProcessor("org.projectlombok:lombok")
+
+	// testImplementation
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	testImplementation("org.seleniumhq.selenium:selenium-java:${seleniumJavaVersion}")
 	testImplementation("io.github.bonigarcia:selenium-jupiter:${seleniumJupiterVersion}")
 	testImplementation("io.github.bonigarcia:webdrivermanager:${webdrivermanagerVersion}")
 	testImplementation("org.junit.jupiter:junit-jupiter-api")
+
+	// testRuntimeOnly
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 
@@ -72,7 +83,6 @@ tasks.test{
 	filter{
 		excludeTestsMatching("*FunctionalTest")
 	}
-
 	finalizedBy(tasks.jacocoTestReport)
 }
 
