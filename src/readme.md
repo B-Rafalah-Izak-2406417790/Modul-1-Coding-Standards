@@ -30,3 +30,30 @@ Reflection 2
     Cara terbaik untuk meningkatkan kebersihan kode adalah dengan menerapkan teknik Inheritance:
      Buat satu kelas dasar (misalnya `BaseFunctionalTest`) yang berisi semua setup umum, injeksi port, dan persiapan variabel URL.
      Ubah `CreateProductFunctionalTest` dan kelas test baru lainnya agar meng-extend kelas dasar tersebut.
+
+Reflection 3
+
+Code Quality Issues dan Strategi Perbaikannya
+Selama pengerjaan ini, saya memperbaiki beberapa masalah kode yang dideteksi oleh SonarCloud. Berikut adalah masalah dan strategi perbaikannya:
+1. Accessibility pada HTML (Thymeleaf):
+SonarCloud mendeteksi bahwa form label tidak terasosiasi dengan control input secara jelas bagi screen reader. Strategi perbaikannya adalah menambahkan atribut for pada tag <label> yang nilainya merujuk langsung pada atribut id dari tag <input> terkait di file createProduct.html dan editProduct.html.
+
+2. Anchor tag sebagai tombol: 
+Penggunaan tag <a> untuk Delete menyalahi aturan semantik web, karena tag anchor seharusnya hanya untuk navigasi. Strategi perbaikannya adalah mengganti tag <a> tersebut dengan tag <form> sebaris yang membungkus <button type="submit">, sambil tetap mempertahankan metode GET ke Controller.
+
+3. Empty Methods: 
+Terdapat peringatan mengenai metode kosong seperti setUp() pada kelas test. Strategi perbaikannya adalah menghapus metode setUp() karena memang tidak memuat inisialisasi apa pun.
+
+4. Field Injection tidak disarankan: 
+Penggunaan @Autowired langsung pada field di ProductController dan ProductServiceImpl memicu Code Smell. Strategi perbaikannya adalah menghapus anotasi tersebut, menjadikan variabelnya final, dan beralih menggunakan pola Constructor Injection.
+
+5. Unnecessary Exceptions & Missing Assertions: 
+Terdapat deklarasi exception yang tidak terpakai dan metode pengujian tanpa assertion yang jelas. Strategi perbaikannya adalah menghapus klausa throws Exception yang berlebih pada metode Selenium, serta membungkus pemanggilan method main() dengan assertDoesNotThrow().
+
+Evaluasi Implementasi CI/CD
+Berdasarkan workflow dan pipeline yang telah dikonfigurasi, saya yakin implementasi saat ini sudah memenuhi definisi Continuous Integration dan Continuous Deployment:
+1. Continuous Integration (CI): 
+Proses CI sudah berjalan dengan baik. Setiap kali terdapat aksi push atau pull request, GitHub Actions secara otomatis menjalankan workflow untuk melakukan build, mengeksekusi seluruh unit test dan functional test, serta menganalisis kualitas kode menggunakan SonarCloud dan JaCoCo. Hal ini memastikan bahwa setiap baris kode baru yang masuk selalu terverifikasi kebenaran dan keamanannya secara otomatis.
+
+2. Continuous Deployment (CD): 
+Proses CD juga telah terpenuhi melalui integrasi repositori GitHub dengan platform Koyeb. Dengan menggunakan pendekatan pull-based, Koyeb secara otomatis memantau branch main. Ketika kode yang sudah lolos uji CI di-merge ke branch tersebut, Koyeb langsung menarik kode terbaru, membangunnya menggunakan Buildpack, dan merilisnya ke production environment.
