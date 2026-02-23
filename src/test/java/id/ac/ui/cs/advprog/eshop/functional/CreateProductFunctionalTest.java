@@ -46,8 +46,6 @@ class CreateProductFunctionalTest {
         WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
         submitButton.click();
 
-        String currentUrl = driver.getCurrentUrl();
-
         String pageSource = driver.getPageSource();
         assertTrue(pageSource.contains("Sampo Cap Bambang"));
         assertTrue(pageSource.contains("100"));
