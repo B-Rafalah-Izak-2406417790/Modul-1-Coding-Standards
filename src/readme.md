@@ -57,3 +57,40 @@ Proses CI sudah berjalan dengan baik. Setiap kali terdapat aksi push atau pull r
 
 2. Continuous Deployment (CD): 
 Proses CD juga telah terpenuhi melalui integrasi repositori GitHub dengan platform Koyeb. Dengan menggunakan pendekatan pull-based, Koyeb secara otomatis memantau branch main. Ketika kode yang sudah lolos uji CI di-merge ke branch tersebut, Koyeb langsung menarik kode terbaru, membangunnya menggunakan Buildpack, dan merilisnya ke production environment.
+
+Reflection 4
+1. Prinsip SOLID yang Diterapkan pada Proyek
+Single Responsibility Principle (SRP): 
+Saya memisahkan tanggung jawab pembuatan UUID (ID produk/car) dari Repository ke Service. Repository benar-benar murni hanya bertugas mengatur penyimpanan data, sedangkan Service menangani logika. Selain itu, saya memisahkan CarController agar tidak lagi mengurus hal-hal terkait Product.
+
+Open/Closed Principle (OCP): 
+Saya memastikan bahwa komponen tingkat tinggi seperti Service dan Controller bergantung pada Interface (seperti ProductRepository dan ProductService). Hal ini membuat aplikasi terbuka untuk perluasan (misal mengganti sistem penyimpanan) tanpa perlu memodifikasi kode inti.
+
+Liskov Substitution Principle (LSP): 
+Saya menghapus pewarisan kelas (extends ProductController) pada CarController. Sebuah kelas anak harus bisa menggantikan kelas induknya tanpa merusak fungsionalitas. Memaksakan CarController menjadi anak dari ProductController justru mewariskan endpoint HTTP yang tidak relevan dan berpotensi memunculkan bug.
+
+Interface Segregation Principle (ISP): 
+Interface dibuat spesifik dan terpisah. ProductService hanya berisi metode untuk Product, dan CarService hanya untuk Car sehingga tidak dipaksa bergantung pada metode yang tidak mereka gunakan.
+
+Dependency Inversion Principle (DIP): 
+Modul tingkat tinggi sekarang bergantung pada abstraksi (Interface). Saya juga mengganti Field Injection (@Autowired pada variabel) dengan Constructor Injection, yang merupakan standar untuk menyuntikkan dependensi dengan aman.
+
+2. Keuntungan Menerapkan Prinsip SOLID beserta Contohnya
+Kemudahan ekstensibilitas (OCP & DIP): 
+Jika di masa depan saya ingin mengganti penyimpanan data dari ArrayList (in-memory) menjadi basis data PostgreSQL, saya hanya perlu membuat kelas baru yang mengimplementasikan interface ProductRepository. Saya tidak perlu mengubah satu baris pun di dalam file ProductServiceImpl.
+
+Lebih Mudah Diuji (Testability): 
+Dengan menggunakan Constructor Injection (DIP), melakukan Unit Testing menjadi sangat mudah karena saya bisa menyuntikkan objek Mock secara manual saat membuat instance dari kelas Service atau Controller di dalam kelas test, tanpa harus menjalankan seluruh kontainer Spring Boot.
+
+Kode Lebih Bersih dan Mudah Dimaintain (SRP): 
+Karena ProductRepository sekarang hanya fokus menyimpan dan mencari data, jika terjadi kesalahan pada generate ID, saya tahu persis bahwa saya harus mengecek ProductServiceImpl, bukan Repositorynya.
+
+3. Kerugian Jika Tidak Menerapkan Prinsip SOLID beserta Contohnya
+Kode Sangat Kaku dan Rentan Rusak: 
+Jika kita melanggar DIP dan bergantung langsung pada implementasi konkrit (seperti sebelum ProductRepository diubah menjadi interface), setiap kali ada perubahan pada cara data disimpan, kita harus merombak kode di Service layer. Ini berisiko merusak logika yang sudah berjalan baik.
+
+Perilaku Sistem Tidak Terduga: 
+Saat melanggar LSP dan SRP (seperti saat CarController extends ProductController), endpoint /car/create dan /product/create bisa saling tumpang tindih secara tidak sengaja. Pengguna yang mengakses menu mobil bisa saja tiba-tiba disajikan halaman untuk mengurus produk.
+
+Kesulitan Isolasi Saat Debugging dan Testing: 
+Jika melanggar SRP (satu kelas melakukan banyak tugas, seperti Controller yang langsung mengurus akses database sekaligus logika pembuatan UUID), saat muncul error, kita akan kesulitan melacak sumber masalahnya. Proses pembuatan Unit Test juga akan sangat panjang dan rumit karena terlalu banyak dependensi yang harus disiapkan untuk mengetes satu fungsi.
