@@ -37,12 +37,23 @@ class ProductServiceImplTest {
 
     @Test
     void testCreate() {
-        // productService.create langsung mengembalikan produk yang diinput,
-        // jadi kita cukup memanggilnya dan memastikan repo.create dipanggil.
         Product savedProduct = productService.create(product);
 
         assertEquals(product.getProductId(), savedProduct.getProductId());
         verify(productRepository, times(1)).create(product);
+    }
+
+    @Test
+    void testCreateProductWithNullId() {
+        Product newProduct = new Product();
+        newProduct.setProductName("Sampo Cap Botak");
+        newProduct.setProductQuantity(10);
+
+        Product savedProduct = productService.create(newProduct);
+
+        assertNotNull(savedProduct.getProductId()); // Harus tidak null (sudah di-generate oleh Service)
+        assertEquals("Sampo Cap Botak", savedProduct.getProductName());
+        verify(productRepository, times(1)).create(newProduct);
     }
 
     @Test
@@ -83,16 +94,22 @@ class ProductServiceImplTest {
 
     @Test
     void testUpdate() {
-        Product result = productService.update(product);
+        Product updatedProduct = new Product();
+        updatedProduct.setProductName("Sampo Cap Bambang Baru");
+        updatedProduct.setProductQuantity(200);
+
+        when(productRepository.update(product.getProductId(), updatedProduct)).thenReturn(updatedProduct);
+
+        Product result = productService.update(product.getProductId(), updatedProduct);
 
         assertNotNull(result);
-        assertEquals(product.getProductName(), result.getProductName());
-        verify(productRepository, times(1)).update(product);
+        assertEquals(updatedProduct.getProductName(), result.getProductName());
+        verify(productRepository, times(1)).update(product.getProductId(), updatedProduct);
     }
 
     @Test
     void testDelete() {
-        productService.delete(product.getProductId());
+        productService.deleteProductById(product.getProductId());
 
         verify(productRepository, times(1)).delete(product.getProductId());
     }

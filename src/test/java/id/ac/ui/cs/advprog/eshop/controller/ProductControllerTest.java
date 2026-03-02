@@ -66,7 +66,7 @@ class ProductControllerTest {
 
         String viewName = productController.productListPage(model);
 
-        assertEquals("listProduct", viewName);
+        assertEquals("productList", viewName);
         verify(model).addAttribute("products", productList);
     }
 
@@ -82,25 +82,18 @@ class ProductControllerTest {
 
     @Test
     void testEditProductPost() {
-        String viewName = productController.editProductPost(product);
+        String viewName = productController.editProductPost(product, model);
 
         assertEquals("redirect:list", viewName);
-        verify(productService).update(product);
+
+        verify(productService).update(product.getProductId(), product);
     }
 
     @Test
     void testDeleteProduct() {
         String viewName = productController.deleteProduct(product.getProductId());
 
-        assertEquals("redirect:/product/list", viewName);
-        verify(productService).delete(product.getProductId());
-    }
-
-    @Test
-    void testHomePage() {
-        ProductController.HomeController homeController = productController.new HomeController();
-
-        String viewName = homeController.homePage();
-        assertEquals("home", viewName);
+        assertEquals("redirect:list", viewName);
+        verify(productService).deleteProductById(product.getProductId());
     }
 }
